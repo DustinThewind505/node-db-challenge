@@ -11,7 +11,32 @@ function getProjectById(id) {
     return db('projects').where({ id })
 }
 
-// =========== POST Project ===========
+// =========== GET Project and Tasks by id ===========
+function getProjectTasksById(id) {
+    return getProjectById(id).then(project => {
+        if(project[0].completed === 0) {
+            project[0] = { ...project[0], completed:  false } 
+        } else {
+            project[0] = { ...project[0], completed: true }
+        }
+        return db('projects').where({ "projects.id": id })
+            .join('tasks', 'tasks.project_id', '=', 'projects.id')
+            .select('tasks.*')
+        .then(tasks => {
+            let newTasks = tasks.map(task => {
+                delete task.project_id;
+                if(task.completed === 0) {
+                    return task = { ...task, completed: false }
+                } else {
+                    return task = { ...task, completed: true }
+                }
+            })
+            return { ...project[0], tasks: newTasks }
+        })
+    })
+}
+
+// =========== POST Projects ===========
 function addProject(project) {
     return db('projects').insert(project)
         .then(ids => {
@@ -19,7 +44,7 @@ function addProject(project) {
         })
 }
 
-// =========== GET Tasks with Project ===========
+// =========== GET Tasks with Projects ===========
 function getTasks() {
     return db('tasks')
         .join('projects', 'projects.id', '=', 'tasks.project_id')
@@ -48,5 +73,6 @@ module.exports = {
     addProject,
     getTasks,
     getTaskById,
-    addTask
+    addTask,
+    getProjectTasksById
 }

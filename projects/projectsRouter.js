@@ -16,7 +16,7 @@ router.get('/', (req, res) => {
         })
 })
 
-// =========== POST Project ===========
+// =========== POST Projects ===========
 router.post('/', (req, res) => {
     Projects.addProject(req.body)
         .then(project => {
@@ -27,9 +27,19 @@ router.post('/', (req, res) => {
         })
 })
 
+// =========== GET Project and Tasks by id ===========
+router.get('/:id', (req, res) => {
+    Projects.getProjectTasksById(req.params.id)
+        .then(project => {
+            res.json(project)
+        })
+        .catch(() => {
+            res.status(500).json({ message: "Failed to get project and tasks" })
+        })
+})
 
 // =========== GET Tasks ===========
-router.get('/tasks', (req, res) => {
+router.get('/:id/tasks', (req, res) => {
     Projects.getTasks()
         .then(tasks => {
             res.json(tasks)
@@ -39,7 +49,7 @@ router.get('/tasks', (req, res) => {
         })
 })
 
-// =========== POST Tasks ===========
+// =========== POST Projects ===========
 router.post('/:id/tasks', (req, res) => {
     Projects.getProjectById(req.params.id)
         .then(projects => {
